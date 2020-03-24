@@ -1,6 +1,6 @@
 """
-    The script is based on the migration guidlinces to ASP.NET Core 3.1: https://docs.microsoft.com/en-us/aspnet/core/migration/30-to-31?view=aspnetcore-3.1&tabs=visual-studio-code.
-    It scans the given directory for Dockerfile, global.json and *.csproj files and applies the new version of aspnetcore. 
+   The script scans the given project directory for: _Docker_, _global.json_ and _*.csproj_ files and 
+   applies required changes as explained in this [article](https://docs.microsoft.com/en-us/aspnet/core/migration/30-to-31?view=aspnetcore-3.1&tabs=visual-studio-code). 
 """
 
 import os
