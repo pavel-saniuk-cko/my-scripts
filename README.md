@@ -13,3 +13,28 @@ The usage is very simple. In you favorite shell execute the script with a valid 
 ```
   python3 dotnet_migration_script.py "Projects/checkout-ap-router/"
 ```
+The script writes to the output applied modifications, for example:
+
+```
+Modified: Projects/checkout-ap-router/global.json
+ -  "version": "3.0.100"
+ +  "version": "3.1.102"
+
+Modified: Projects/checkout-ap-router/test/ApmRouter.Common.UnitTests/ApmRouter.Common.UnitTests.csproj
+ -  <TargetFramework>netcoreapp3.0</TargetFramework>
+ +  <TargetFramework>netcoreapp3.1</TargetFramework>
+ 
+ Modified: Projects/checkout-ap-router/src/ApmRouter.Common/ApmRouter.Common.csproj
+ -  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.0.0" />
+ +  <PackageReference Include="Microsoft.AspNetCore.TestHost" Version="3.1.1" />
+
+Modified: Projects/checkout-ap-router/src/ApmRouter.WebApi.Internal/Dockerfile
+ -  FROM mcr.microsoft.com/dotnet/core/sdk:3.0.100-alpine3.9  AS build
+ +  FROM mcr.microsoft.com/dotnet/core/sdk:3.1.102-alpine3.11  AS build
+
+Modified: Projects/checkout-ap-router/src/ApmRouter.WebApi.Internal/Dockerfile
+ -  FROM mcr.microsoft.com/dotnet/core/aspnet:3.0.0-alpine3.9
+ +  FROM mcr.microsoft.com/dotnet/core/aspnet:3.1.2-alpine3.11
+```
+
+Will keep silence if nothing was updated.
