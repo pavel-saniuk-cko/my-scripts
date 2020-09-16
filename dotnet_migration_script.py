@@ -12,6 +12,12 @@ dockerLambda = lambda entry: os.path.basename(entry) == "Dockerfile"
 globalJsonLambda = lambda entry: os.path.basename(entry) == "global.json"
 csprojLamba = lambda entry: os.path.splitext(entry)[1] == ".csproj"
 
+targetFramework = os.environ.get('DOTNET_MIGRATION_TARGET_FRAMEWORK') or "3.1"
+packageVersion = os.environ.get('DOTNET_MIGRATION_PACKAGE_VERSION') or "3.1.1"
+sdkVersion = os.environ.get('DOTNET_MIGRATION_SDK_VERSION') or "3.1.102"
+sdkImage = os.environ.get('DOTNET_MIGRATION_SDK_IMAGE') or "3.1.102-alpine3.11"
+runtimeImage = os.environ.get('DOTNET_MIGRATION_RUNTIME_IMAGE') or "3.1.2-alpine3.11"
+
 fileProcessorMappings = {
     dockerLambda: lambda line: replace(line, dockerFileRegexReplacementMappings),
     globalJsonLambda: lambda line: replace(line, globalJsonRegexReplacementMappings),
@@ -19,16 +25,16 @@ fileProcessorMappings = {
 }
 
 dockerFileRegexReplacementMappings = [
-    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/sdk:\S+"), "mcr.microsoft.com/dotnet/core/sdk:3.1.102-alpine3.11"),
-    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/aspnet:\S+"), "mcr.microsoft.com/dotnet/core/aspnet:3.1.2-alpine3.11")
+    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/sdk:\S+"), "mcr.microsoft.com/dotnet/core/sdk:" + sdkImage),
+    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/aspnet:\S+"), "mcr.microsoft.com/dotnet/core/aspnet:" + runtimeImage)
 ]
 
 globalJsonRegexReplacementMappings = [
-    (re.compile(r"\"version\":\s?\"\d\.\d\.\d+\""), "\"version\": \"3.1.102\"")
+    (re.compile(r"\"version\":\s?\"\d\.\d\.\d+\""), "\"version\": \"" + sdkVersion + "\"")
 ]   
 
 projFileRegexReplacementMappings = [
-    (re.compile(r"<TargetFramework>netcoreapp\S+<\/TargetFramework>"), "<TargetFramework>netcoreapp3.1</TargetFramework>")
+    (re.compile(r"<TargetFramework>netcoreapp\S+<\/TargetFramework>"), "<TargetFramework>netcoreapp" + targetFramework + "</TargetFramework>")
 ]
 
 def replace(line, mappings):
@@ -42,7 +48,7 @@ versionRegex = re.compile(r"Version=\"\d.\d.\d\"")
 
 def migrateProjFile(line):
     if packageReferenceRegex.search(line):
-        return versionRegex.sub("Version=\"3.1.1\"", line)
+        return versionRegex.sub("Version=\"" + packageVersion + "\"", line)
     return replace(line, projFileRegexReplacementMappings)
 
 def printDiff(entry, originalLine, modifedLine):
