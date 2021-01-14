@@ -10,23 +10,22 @@ import re
 
 dockerLambda = lambda entry: os.path.basename(entry) == "Dockerfile"
 globalJsonLambda = lambda entry: os.path.basename(entry) == "global.json"
-csprojLamba = lambda entry: os.path.splitext(entry)[1] == ".csproj"
+csprojLambda = lambda entry: os.path.splitext(entry)[1] == ".csproj"
 
 targetFramework = os.environ.get('DOTNET_MIGRATION_TARGET_FRAMEWORK') or "3.1"
-packageVersion = os.environ.get('DOTNET_MIGRATION_PACKAGE_VERSION') or "3.1.1"
-sdkVersion = os.environ.get('DOTNET_MIGRATION_SDK_VERSION') or "3.1.102"
-sdkImage = os.environ.get('DOTNET_MIGRATION_SDK_IMAGE') or "3.1.102-alpine3.11"
-runtimeImage = os.environ.get('DOTNET_MIGRATION_RUNTIME_IMAGE') or "3.1.2-alpine3.11"
+packageVersion = os.environ.get('DOTNET_MIGRATION_PACKAGE_VERSION') or "3.1.11"
+sdkVersion = os.environ.get('DOTNET_MIGRATION_SDK_VERSION') or "3.1.405"
 
 fileProcessorMappings = {
     dockerLambda: lambda line: replace(line, dockerFileRegexReplacementMappings),
     globalJsonLambda: lambda line: replace(line, globalJsonRegexReplacementMappings),
-    csprojLamba: lambda line: migrateProjFile(line)
+    csprojLambda: lambda line: migrateProjFile(line)
 }
 
 dockerFileRegexReplacementMappings = [
-    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/sdk:\S+"), "mcr.microsoft.com/dotnet/core/sdk:" + sdkImage),
-    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/aspnet:\S+"), "mcr.microsoft.com/dotnet/core/aspnet:" + runtimeImage)
+    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/sdk:\S+"), "mcr.microsoft.com/dotnet/sdk:" + targetFramework),
+    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/aspnet:\S+"), "mcr.microsoft.com/dotnet/aspnet:" + targetFramework),
+    (re.compile(r"\S*mcr\.microsoft\.com\/dotnet\/core\/runtime:\S+"), "mcr.microsoft.com/dotnet/runtime:" + targetFramework)
 ]
 
 globalJsonRegexReplacementMappings = [
